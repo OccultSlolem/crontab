@@ -1,0 +1,15 @@
+# ---- GITEA BACKUP ----
+
+mkdir ~/DocumentsNotICloud/temp/gitea_dump # create temp dir for backup
+
+docker exec -u git -it gitea /bin/bash -c 'cd /app/gitea && gitea dump -f gitea_dump.zip -c /data/gitea/conf/app.ini' # execute dump command inside gitea
+
+docker cp gitea:/app/gitea/gitea_dump.zip ~/DocumentsNotICloud/temp/gitea_dump/gitea_dump.zip # copy dump to local filesystem
+
+gsutil cp ~/DocumentsNotICloud/temp/gitea_dump/gitea_dump.zip gs://gitea_backups/gitea_dump_$(date +%s).zip # upload to gcloud
+
+rm -rf ~/DocumentsNotICloud/temp/gitea_dump # delete local gitea dump
+
+docker exec gitea /bin/bash -c 'rm /app/gitea/gitea_dump.zip' # delete container gitea dump
+
+# ---- FIN ----
